@@ -5,6 +5,8 @@ import fr.univ_amu.iut.exercice4.Site;
 import fr.univ_amu.iut.jdbc.DataAccessException;
 import java.time.LocalDate;
 import java.util.Optional;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -39,16 +41,25 @@ public class SitesController {
 
   @FXML
   private void initialize() {
-    // TODO exercice 7 : câbler la vue sur le ViewModel.
-    //
-    // 1. Pour chaque colonne, définir une cell value factory qui lit le champ du Site
-    //    (numeroCarre, nomConvivial, protocole).
-    // 2. Donner ses items à la TableView : setItems + viewModel.sitesProperty().
-    // 3. Lier le texte de labelResume au resumeProperty() du ViewModel.
-    // 4. Remplir choiceProtocole avec les deux protocoles ("PointFixeStandard",
-    //    "PointFixeRecherche").
-    // 5. Désactiver boutonSupprimer tant qu'aucune ligne n'est sélectionnée
-    //    (disableProperty lié à selectedItemProperty().isNull() du selection model).
+    // 1) Colonnes : exposer les valeurs du Site
+    colNumero.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().numeroCarre()));
+    colNom.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().nomConvivial()));
+    colProtocole.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().protocole()));
+
+    // 2) items du tableau : lier à la liste observable du ViewModel
+    tableSites.setItems(viewModel.sitesProperty());
+
+    // 3) résumé lié au ViewModel
+    labelResume.textProperty().bind(viewModel.resumeProperty());
+
+    // 4) remplir le ChoiceBox des protocoles
+    choiceProtocole.setItems(
+        FXCollections.observableArrayList("PointFixeStandard", "PointFixeRecherche"));
+
+    // 5) bouton Supprimer désactivé tant qu'aucune sélection
+    boutonSupprimer
+        .disableProperty()
+        .bind(tableSites.getSelectionModel().selectedItemProperty().isNull());
   }
 
   @FXML
